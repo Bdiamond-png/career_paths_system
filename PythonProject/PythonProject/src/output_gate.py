@@ -8,6 +8,7 @@ class OutputGateReport:
     risky_steps: List[str]
     notes: List[str]
 
+
 class OutputGate:
     def __init__(self, feasibility_report):
         self.report = feasibility_report
@@ -15,7 +16,7 @@ class OutputGate:
     def check_output(self) -> OutputGateReport:
         blocked_steps = self.report.blocked_steps
         risky_steps = self.report.risky_steps
-        notes = []
+        notes = [}
 
         allowed = True
 
@@ -27,7 +28,6 @@ class OutputGate:
             allowed = False
             notes.append(f"Output blocked due to risky steps: {', '.join(risky_steps)}")
 
-        # Include original notes for more context
         notes.extend(self.report.notes)
 
         return OutputGateReport(
