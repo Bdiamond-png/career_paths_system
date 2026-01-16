@@ -32,7 +32,6 @@ class MockEvidenceBinding:
     evidence: List[MockEvidence]
 
 def test_coordinator_success():
-    # Step 0: raw data
     raw_data = {"field1": 1, "field2": 2}
 
     evidence_binding = MockEvidenceBinding(
@@ -61,7 +60,6 @@ def test_coordinator_success():
 
     final_report = coordinator.run()
 
-    # --- Assertions ---
     assert final_report.status == "SUCCESS"
     assert final_report.blocked_steps == []
     assert final_report.risky_steps == []

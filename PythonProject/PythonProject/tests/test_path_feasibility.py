@@ -3,7 +3,6 @@ from path_feasibility import *
 from dataclasses import dataclass
 from typing import List
 
-# Mock ledger entry for testing
 @dataclass
 class MockLedgerEntry:
     id: str
@@ -66,7 +65,6 @@ def test_blocked_failed_dependency():
         PathStep(id="s1", description="Step 1", required_evidence_ids=["e1"]),
         PathStep(id="s2", description="Step 2", dependencies=["s1"])
     ]
-    # simulate s1 not passed in ledger
     ledger.entries["s1"] = MockLedgerEntry(id="s1", trusted=True, refused=False, status="FAILED", confidence_score=1.0)
     checker = PathFeasibilityChecker(steps, ledger)
     report = checker.check()
