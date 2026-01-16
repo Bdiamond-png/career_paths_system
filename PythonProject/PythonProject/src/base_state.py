@@ -9,11 +9,24 @@ class BaseState:
         self.logs.append(message)
 
 
-    def refuse(self, reason):
+    def refuse(self, reason, reference=None):
         self.refused = True
         self.refusal_reason = reason
+        self.log(f'Refused: {reason}')
+        if reference:
+            self.log(f"Refusal reference: {reference}")
 
 
-    def check_invariant(self, condition, message):
+    def check_invariant(self, condition, message, reference=None):
         if not condition:
-            self.refuse(message)
+            self.refuse(message,reference)
+
+    def assert_trust(self):
+        if self.refused:
+            raise RuntimeError(f"Refusal reason: {self.refusal_reason} ")
+
+    def require_trust(func):
+        def wrapper(self, *args, **kwargs):
+            self.assert_trust()
+            return func(self, *args, **kwargs)
+        return wrapper

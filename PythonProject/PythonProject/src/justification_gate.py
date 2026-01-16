@@ -1,23 +1,82 @@
-from base_state import BaseState
+from dataclasses import dataclass
+from typing import Any, List
 
 
-class JustificationGate(BaseState):
-
-    def __init__(self, confidence_score, evidence):
-        super().__init__()
-        self.confidence_score = confidence_score
-        self.evidence = evidence
+@dataclass(frozen=True)
+class Claim:
+    description: str
 
 
-    def verify_justification(self):
-        if not self.evidence:
-            self.check_invariant(False, "no evidence found")
-            self.refuse('confidence score cannot be justified')
-            return False
+@dataclass(frozen=True)
+class Evidence:
+    payload: Any
+    source: str
 
-        if not (0.0 <= self.confidence_score <= 1.0):
-            self.check_invariant(False, "confidence score out of bounds")
-            self.refuse('confidence score is invalid')
-            return False
-        self.log('confidence score verified')
-        return True
+
+@dataclass(frozen=True)
+class EvidenceBinding:
+    claim: Claim
+    evidence: List[Evidence]
+
+
+@dataclass(frozen=True)
+class TrustState:
+    trusted: bool
+    verified_data: Any = None
+    refusal_reason: str = None
+
+
+class JustificationGate:
+    """
+    Validates whether provided evidence logically supports the claim.
+    Does not extend BaseState.
+    Stays fully isolated from other pipeline components.
+    """
+
+    @staticmethod
+    def justify(binding: EvidenceBinding) -> TrustState:
+
+        # No evidence provided
+        if not binding.evidence:
+            return TrustState(
+                trusted=False,
+                refusal_reason="No evidence provided"
+            )
+
+        evidence = binding.evidence[0]
+
+        # Missing payload
+        if evidence.payload is None:
+            return TrustState(
+                trusted=False,
+                refusal_reason="Evidence payload missing"
+            )
+
+        # Unstructured payload
+        if not isinstance(evidence.payload, dict):
+            return TrustState(
+                trusted=False,
+                refusal_reason="Payload is not structured data"
+            )
+
+        # Empty payload
+        if len(evidence.payload) == 0:
+            return TrustState(
+                trusted=False,
+                refusal_reason="Evidence payload missing"
+            )
+
+        # Claim-specific validation
+        if binding.claim.description.lower() == "data is complete and aligned":
+            for key, value in evidence.payload.items():
+                if value is None:
+                    return TrustState(
+                        trusted=False,
+                        refusal_reason=f"Data incomplete at key '{key}'"
+                    )
+
+        # Passed
+        return TrustState(
+            trusted=True,
+            verified_data=evidence.payload
+        )

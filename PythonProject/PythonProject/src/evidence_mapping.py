@@ -1,28 +1,31 @@
-from base_state import BaseState
-
-class EvidenceMapping(BaseState):
-    def __init__(self, claims):
-        super().__init__()
-        self.raw_claims = claims
-        self.verified_evidence = []
-        self.confidence_score = 0.0
+from dataclasses import dataclass
+from typing import Any, List, Optional
+from justification_gate import Evidence, TrustState
 
 
-    def verify_claim(self, claim):
-        return bool(claim.get("evidence"))
+@dataclass(frozen=True)
+class EvidenceMappingEntry:
+    id: str
+    evidence: Evidence
 
-    def generate_confidence_score(self):
-        self.verified_evidence = [
-            claim for claim in self.raw_claims
-            if self.verify_claim(claim)
-        ]
 
-        if not self.verified_evidence:
-            self.check_invariant(False, "No evidence found")
-            return None
-        total_claims = len(self.raw_claims)
-        verified_count = len(self.verified_evidence)
-        self.confidence_score = verified_count / total_claims
+class EvidenceMapping:
 
-        self.log(f"confidence score calculated: {self.confidence_score:.2f}")
-        return self.confidence_score, self.verified_evidence
+    def __init__(self, entries: List[EvidenceMappingEntry]):
+        self.entries = {e.id: e for e in entries}
+
+    def get(self, evidence_id: str) -> Optional[Evidence]:
+        return self.entries.get(evidence_id).evidence if evidence_id in self.entries else None
+
+    def validate(self, evidence_id: str) -> TrustState:
+        entry = self.entries.get(evidence_id)
+        if not entry:
+            return TrustState(trusted=False, refusal_reason=f"Missing evidence: {evidence_id}")
+        ev = entry.evidence
+        if ev.payload is None:
+            return TrustState(trusted=False, refusal_reason=f"Evidence payload missing for {evidence_id}")
+        if not isinstance(ev.payload, dict):
+            return TrustState(trusted=False, refusal_reason=f"Evidence payload unstructured for {evidence_id}")
+        if len(ev.payload) == 0:
+            return TrustState(trusted=False, refusal_reason=f"Evidence payload empty for {evidence_id}")
+        return TrustState(trusted=True, verified_data=ev.payload)

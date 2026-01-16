@@ -1,15 +1,38 @@
-from base_state import BaseState
+from dataclasses import dataclass
+from typing import List
 
-class OutputGate(BaseState):
-    def __init__(self, paths_with_evidence=None):
-        super().__init__()
-        self.paths_with_evidence = paths_with_evidence or []
+@dataclass
+class OutputGateReport:
+    allowed: bool
+    blocked_steps: List[str]
+    risky_steps: List[str]
+    notes: List[str]
 
+class OutputGate:
+    def __init__(self, feasibility_report):
+        self.report = feasibility_report
 
-    def verify_paths(self):
-        valid_paths = []
-        for item in self.paths_with_evidence:
-            if 'evidence' not in item or not item['evidence']:
-                self.check_invariant(False, f"Path is missing evidence: {item.get('path', 'Unknown')}")
-                self.log(f"Refused path: {item.get('path', 'Unknown')} due to missing evidence")
-                self.refused = False
+    def check_output(self) -> OutputGateReport:
+        blocked_steps = self.report.blocked_steps
+        risky_steps = self.report.risky_steps
+        notes = []
+
+        allowed = True
+
+        if blocked_steps:
+            allowed = False
+            notes.append(f"Output blocked due to blocked steps: {', '.join(blocked_steps)}")
+
+        if risky_steps:
+            allowed = False
+            notes.append(f"Output blocked due to risky steps: {', '.join(risky_steps)}")
+
+        # Include original notes for more context
+        notes.extend(self.report.notes)
+
+        return OutputGateReport(
+            allowed=allowed,
+            blocked_steps=blocked_steps,
+            risky_steps=risky_steps,
+            notes=notes
+        )
