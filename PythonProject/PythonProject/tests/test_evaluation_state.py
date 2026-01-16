@@ -4,7 +4,6 @@ from path_feasibility import PathFeasibilityReport
 from output_gate import OutputGateReport
 from evaluation import Evaluation, EvaluationReport
 
-# Mock reports
 @pytest.fixture
 def blocked_report():
     return PathFeasibilityReport(
@@ -60,9 +59,9 @@ def test_evaluation_success(success_report):
 def test_evaluation_with_output_gate(success_report):
     output_notes = ["OutputGate: success confirmed"]
     output_report = OutputGateReport(
-        allowed=True,           # allowed output
-        blocked_steps=[],       # no blocked steps
-        risky_steps=[],         # no risky steps
+        allowed=True,
+        blocked_steps=[],
+        risky_steps=[],
         notes=output_notes
     )
 

@@ -4,7 +4,6 @@ from typing import List
 from path_feasibility import PathStep, PathFeasibilityReport
 from output_gate import *
 
-# Mock report for testing
 @dataclass
 class MockPathFeasibilityReport:
     feasible: bool

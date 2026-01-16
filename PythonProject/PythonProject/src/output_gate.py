@@ -16,7 +16,7 @@ class OutputGate:
     def check_output(self) -> OutputGateReport:
         blocked_steps = self.report.blocked_steps
         risky_steps = self.report.risky_steps
-        notes = [}
+        notes = []
 
         allowed = True
 
