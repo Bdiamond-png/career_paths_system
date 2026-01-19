@@ -20,7 +20,6 @@ class Coordinator:
         self.final_evaluation: Optional[EvaluationReport] = None
 
     def run(self) -> EvaluationReport:
-        # Step 1: Load and verify data
         self.data_state = DataState(self.raw_data)
         self.data_state.load_data()
 
@@ -29,7 +28,6 @@ class Coordinator:
         self.data_state.verify_data(labels_align, data_complete)
 
         if self.data_state.refused:
-            # Data verification failed
             notes = list(self.data_state.logs)
             self.final_evaluation = EvaluationReport(
                 status="FAILED",

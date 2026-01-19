@@ -84,3 +84,15 @@ def test_risky_low_confidence():
     assert report.feasible is False
     assert "s1" in report.risky_steps
     assert any("low confidence in evidence e1" in note for note in report.notes)
+
+def test_check_dependencies_passed():
+    step = PathStep(id="s2", description="Step 2", dependencies=["s1"])
+    step_status = {"s1": "PASSED"}
+    checker = PathFeasibilityChecker(path=[], ledger=MockLedger(entries={}))
+    assert checker.check_dependencies(step, step_status) is None
+
+def test_check_dependencies_blocked():
+    step = PathStep(id="s2", description="Step 2", dependencies=["s1"])
+    step_status = {"s1":  "FAILED"}
+    checker = PathFeasibilityChecker(path=[], ledger=MockLedger(entries={}))
+    assert checker.check_dependencies(step, step_status) == "s1"

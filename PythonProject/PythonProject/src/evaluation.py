@@ -18,7 +18,6 @@ class Evaluation:
         risky = self.path_report.risky_steps
         notes = list(self.path_report.notes)
 
-        # Incorporate OutputGate notes if available
         if self.output_report:
             notes.extend(self.output_report.notes)
 

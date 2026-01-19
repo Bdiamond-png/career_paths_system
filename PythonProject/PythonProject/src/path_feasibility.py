@@ -20,6 +20,15 @@ class PathFeasibilityChecker:
         self.path = path
         self.ledger = ledger
 
+    def check_dependencies(self, step: PathStep, step_status: dict):
+        for dep_id in step.dependencies or []:
+            dep_entry = self.ledger.get_entry(dep_id)
+            dep_status = dep_entry.status if dep_entry else step_status.get(dep_id)
+
+            if dep_status != "PASSED":
+                return dep_id
+            return None
+
     def check(self) -> PathFeasibilityReport:
         blocked: List[str] = []
         risky: List[str] = []
@@ -28,21 +37,12 @@ class PathFeasibilityChecker:
         step_status: Dict[str, str] = {}
 
         for step in self.path:
-            if step.dependencies:
-                for dep_id in step.dependencies:
-                    # Get the dependency step's status from ledger if exists
-                    dep_entry = self.ledger.get_entry(dep_id)
-                    dep_status = None
-                    if dep_entry:
-                        dep_status = dep_entry.status
-                    else:
-                        dep_status = step_status.get(dep_id)
-
-                    if dep_status != "PASSED":
-                        blocked.append(step.id)
-                        notes.append(f"Step {step.id} is blocked by dependency {dep_id}")
-                        step_status[step.id] = "BLOCKED"
-                        break  # stop checking other dependencies
+            blocked_dep = self.check_dependencies(step, step_status)
+            if blocked_dep:
+                blocked.append(step.id)
+                notes.append(f"Step {step.id} is blocked by dependency {blocked_dep}")
+                step_status[step.id] = "BLOCKED"
+                continue
 
             if step.id in blocked:
                 continue
