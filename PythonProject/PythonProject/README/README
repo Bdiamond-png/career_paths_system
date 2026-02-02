@@ -1,0 +1,24 @@
+what is this?
+why does it exist?
+what problem does it solve (and what does it NOT solve)?
+how does it work at a high level?
+how should i reason about changing it?
+
+a README should allow a new engineer to form a correct mental model without reading the code
+
+project overview
+
+motivation
+
+system boundaries
+
+high level flow
+
+core concepts
+
+design principles
+
+failure modes and guarantees
+
+how to extend safely
+
