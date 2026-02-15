@@ -8,11 +8,13 @@ from output_gate import *
 from evaluation import *
 class Coordinator:
 
-    def __init__(self, raw_data, evidence_bindings, path_steps, ledger):
+    def __init__(self, raw_data, evidence_bindings, path_steps, ledger, db_manager):
         self.raw_data = raw_data
         self.evidence_bindings = evidence_bindings
         self.path_steps = path_steps
         self.ledger = ledger
+        self.db = db_manager
+        self.run_id = None
 
         self.data_state: Optional[DataState] = None
         self.path_report: Optional[PathFeasibilityReport] = None
@@ -20,6 +22,7 @@ class Coordinator:
         self.final_evaluation: Optional[EvaluationReport] = None
 
     def run(self) -> EvaluationReport:
+        self.run_id = self.db.create_new_run()
         self.data_state = DataState(self.raw_data)
         self.data_state.load_data()
 
@@ -40,6 +43,11 @@ class Coordinator:
         trust_states = []
         for binding in self.evidence_bindings:
             trust_state = JustificationGate.justify(binding)
+            self.db.log_state_result(
+                run_id=self.run_id,
+                state_name="Justification Gate",
+                final_result=trust_state
+            )
             trust_states.append(trust_state)
 
             if not trust_state.trusted:

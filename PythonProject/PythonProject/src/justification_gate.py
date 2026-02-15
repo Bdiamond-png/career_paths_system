@@ -37,10 +37,9 @@ class JustificationGate:
                 refusal_reason="No evidence provided"
             )
 
-        evidence = binding.evidence[0]
-
-        if evidence.payload is None:
-            return TrustState(
+        for evidence in binding.evidence:
+            if evidence.payload is None:
+                return TrustState(
                 trusted=False,
                 refusal_reason="Evidence payload missing"
             )
@@ -67,5 +66,5 @@ class JustificationGate:
 
         return TrustState(
             trusted=True,
-            verified_data=evidence.payload
+            verified_data= [e.payload for e in binding.evidence]
         )
