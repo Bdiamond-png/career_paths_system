@@ -1,6 +1,6 @@
 import pytest
 from evidence_mapping import EvidenceMapping, EvidenceMappingEntry
-from justification_gate import Evidence, TrustState
+from justification_gate import Evidence
 
 
 def test_evidence_mapping_validate_success():

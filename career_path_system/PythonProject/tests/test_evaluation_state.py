@@ -1,8 +1,8 @@
 import pytest
-from dataclasses import dataclass
 from path_feasibility import PathFeasibilityReport
 from output_gate import OutputGateReport
-from evaluation import Evaluation, EvaluationReport
+from evaluation import Evaluation
+
 
 @pytest.fixture
 def blocked_report():

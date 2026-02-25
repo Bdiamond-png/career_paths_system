@@ -27,7 +27,7 @@ class PathFeasibilityChecker:
 
             if dep_status != "PASSED":
                 return dep_id
-            return None
+        return None
 
     def check(self) -> PathFeasibilityReport:
         blocked: List[str] = []
