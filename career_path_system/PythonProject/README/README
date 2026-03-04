@@ -1,24 +1,71 @@
-what is this?
-why does it exist?
-what problem does it solve (and what does it NOT solve)?
-how does it work at a high level?
-how should i reason about changing it?
+!!!MADE FOR LEARNING PURPOSES!!!
+Initially I had no plan of getting this project live, the only reason I have added
+SQL and API was for more learning!
 
-a README should allow a new engineer to form a correct mental model without reading the code
+This project is an early stage backend system designed to explore how decisions can be made safely and
+consistently under explicit rules, constraints, and data contracts.
+I built this project to practice backend engineering fundamentals state modeling, data validation,
+defensive design and reasoning about system behavior under imperfect inputs.
+At a high level, the system models decision making as a state machine.
 
-project overview
+Instead of starting with APIs or databases I wanted to start with logic. My goal was to understand invariants
+and boundaries, then built outwards.
 
-motivation
+This system is structured as a pipeline:
+1. DataState
+raw inputs are received immediately checked for basic validity
+2. EvidenceMapping
+Inputs must be transformed into a structured dictionary representing evidence.
+Any non-dictionary payload is explicitly rejected to prevent ambiguous state.
+3. JustificationGate
+Evidence is evaluated against predefined rules. If justification criteria are not met, the decision process halts.
+4. PathFeasibility
+The justified evidence is transformed into steps to create paths based on dependencies.
+5. OutputGate
+Only steps that are valid can produce an outcome.
 
-system boundaries
+Each stage is intentionally isolated to prevent upstream errors from leaking downstream.
+Each component defines what shape of data it accepts.
+-During development I found an test case that allowed integers to pass as valid evidence. I fixed this by explicitly
+refused non-dictionary inputs at multiple boundaries.
 
-high level flow
+The system models decisions as transitions between known states, rather than a series of ad-hoc conditionals.
+Making behavior predictable and testable.
 
-core concepts
+I assume inputs are wrong until proven otherwise. Failures should be loud, early, and informative
 
-design principles
+This project is:
+A learning focused backend system
+An exploration of state machine and validation logic
+An exploration of SQL and API
+A foundation for more complex distributed systems
 
-failure modes and guarantees
+This project is not:
+A product-ready service
+A framework or library
+An AI or ML system
 
-how to extend safely
+Current Status
+Core state machine implemented
+Evidence validation enforced
+JustificationGate reject invalid payloads
+Unit test focused on failure cases
+Introduced SQLite
+Introduced Flask API
+
+Plans
+Real runs with mock data
+Scaling with size (if a million people ran the machine at once)
+API endpoints
+
+Backend systems succeed or fail based on decisions users never see. This project reflects how I approach engineering
+problems: define constraints, make assumptions explicit, and design systems that fail safely instead of silently.
+
+Stack
+Language: Python
+Paradigm: Object-Oriented Design
+Concepts: State machines, validation, defensive design
+
+Malachi Thomas
+Aspiring Software Engineer
 
